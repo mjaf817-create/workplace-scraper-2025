@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # MongoDB service (already running locally, but including for completeness)
+  mongodb:
+    image: mongo:8.2.1
+    container_name: workplace_mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: workplace_relations
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - workplace_network
+
+  # MinIO Object Storage (Landing Zone)
+  minio_landing:
+    image: minio/minio:latest
+    container_name: workplace_minio_landing
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_landing_data:/data
+    networks:
+      - workplace_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # MinIO Object Storage (Curated/Transformed Zone)
+  minio_curated:
+    image: minio/minio:latest
+    container_name: workplace_minio_curated
+    ports:
+      - "9002:9000"
+      - "9003:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_curated_data:/data
+    networks:
+      - workplace_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  mongodb_data:
+    driver: local
+  minio_landing_data:
+    driver: local
+  minio_curated_data:
+    driver: local
+
+networks:
+  workplace_network:
+    driver: bridge

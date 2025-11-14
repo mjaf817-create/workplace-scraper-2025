@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# Scrapy
+.scrapy/
+httpcache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+missing_files.json
+
+# Database exports
+*.json
+*.csv
+!sample_data/*.json
+!sample_data/*.csv
+
+# HTML reports
+*.html
+
+# Debug files
+debug/
